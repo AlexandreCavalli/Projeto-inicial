@@ -1,72 +1,133 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Orçamento – Cortina Automatizada</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h2, h3 { margin-top: 20px; }
-        input, select { margin: 5px 0; width: 220px; padding: 5px; }
-        button { margin-top: 15px; padding: 10px 20px; font-size: 16px; }
-        .resumo { margin-top: 25px; padding: 15px; border: 1px solid #ccc; }
-        .linha { margin-bottom: 6px; }
-        hr { margin: 10px 0; }
-    </style>
+<meta charset="UTF-8">
+<title>Orçamento APS</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    font-size: 14px;
+}
+
+.input-box {
+    border: 1px solid #ccc;
+    padding: 15px;
+    background: #f9f9f9;
+    max-width: 600px;
+    margin: 0 auto 20px auto;
+}
+
+label {
+    display: inline-block;
+    width: 160px;
+}
+
+button {
+    padding: 8px 15px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.resultado-box {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td {
+    padding: 6px 4px;
+}
+
+.desc {
+    width: 65%;
+}
+
+.valor {
+    width: 35%;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.linha-nf td {
+    border-top: 1px dashed #999;
+}
+
+.linha-total td {
+    border-top: 2px solid #b30000;
+    color: #b30000;
+    font-weight: bold;
+    font-size: 18px;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Orçamento – Cortina Automatizada</h2>
+<div class="input-box">
+    <strong>Cálculo do orçamento</strong><br><br>
 
-<h3>Medidas</h3>
-Largura (cm):<br>
-<input type="number" id="largura"><br>
+    <label>Largura (cm):</label>
+    <input type="number" id="largura"><br><br>
 
-Altura (cm):<br>
-<input type="number" id="altura"><br>
+    <label>Altura (cm):</label>
+    <input type="number" id="altura"><br><br>
 
-<h3>Tiras</h3>
-Modelo da tira:<br>
-<select id="modeloTira">
-    <option value="perfurada_080">Perfurada 0,80</option>
-    <option value="perfurada_060">Perfurada 0,60</option>
-    <option value="lisa_080">Lisa 0,80</option>
-    <option value="lisa_070">Lisa 0,70</option>
-</select>
+    <label>Modelo da tira:</label>
+    <select id="tira">
+        <option value="12">Perfurada 0,80</option>
+        <option value="10">Perfurada 0,60</option>
+        <option value="11">Lisa 0,80</option>
+        <option value="9">Lisa 0,70</option>
+    </select><br><br>
 
-<h3>Kit Guia</h3>
-Tipo:<br>
-<select id="kitTipo">
-    <option value="100">Kit 100</option>
-    <option value="130">Kit 130</option>
-</select><br>
+    <label>Kit guia:</label>
+    <select id="kitTipo">
+        <option value="230">Kit 100</option>
+        <option value="280">Kit 130</option>
+    </select>
+    <input type="number" id="kitQtd" value="0"><br><br>
 
-Quantidade:<br>
-<input type="number" id="kitQtd" value="0">
+    <label>Com pintura epóxi:</label>
+    <input type="checkbox" id="pintura"><br><br>
 
-<h3>Outros</h3>
-<input type="checkbox" id="pintura"> Com pintura epóxi<br><br>
+    <label>Centrais:</label>
+    <input type="number" id="centrais" value="0"><br><br>
 
-Centrais (R$ 250 cada):<br>
-<input type="number" id="centrais" value="0"><br>
+    <label>Mão de obra (R$):</label>
+    <input type="number" id="mao" value="0"><br><br>
 
-Mão de obra (R$):<br>
-<input type="number" id="maoObra" value="0"><br>
+    <button onclick="calcular()">Calcular</button>
+</div>
 
-<button onclick="calcular()">Calcular Orçamento</button>
-
-<div class="resumo" id="resultado"></div>
+<div id="resultado" class="resultado-box"></div>
 
 <script>
+function moeda(valor) {
+    return valor.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    });
+}
+
 function calcular() {
-    const larguraCm = Number(document.getElementById("largura").value);
-    const alturaCm = Number(document.getElementById("altura").value);
 
-    const larguraM = larguraCm / 100;
+    const largura = Number(document.getElementById("largura").value);
+    const altura = Number(document.getElementById("altura").value);
 
-    // METRAGEM (m²)
-    const metragem = (larguraCm * alturaCm) / 10000;
+    if (!largura || !altura) {
+        alert("Preencha largura e altura.");
+        return;
+    }
 
-    // REGRAS FIXAS MOTOR / EIXO / SOLEIRA
+    const larguraM = largura / 100;
+    const area = (largura * altura) / 10000;
+
     const regras = [
         { ate: 10, motor: 200, preco: 800, eixo: "4,5", soleira: "30 x 50" },
         { ate: 14, motor: 300, preco: 900, eixo: "4,5", soleira: "30 x 50" },
@@ -78,82 +139,62 @@ function calcular() {
         { ate: 60, motor: 2000, preco: 5500, eixo: "8.0", soleira: "40 x 80" }
     ];
 
-    const regra = regras.find(r => metragem <= r.ate);
-    if (!regra) {
-        document.getElementById("resultado").innerHTML =
-            "<strong>Medida acima do limite permitido.</strong>";
-        return;
-    }
+    const regra = regras.find(r => area <= r.ate);
 
-    // EIXO
-    const valorMetroEixo = { "4,5": 60, "5,5": 85, "8.0": 163 }[regra.eixo];
-    const valorEixo = larguraM * valorMetroEixo;
+    const eixoValorMetro = { "4,5": 60, "5,5": 85, "8.0": 163 };
+    const soleiraValorMetro = { "30 x 50": 25, "40 x 60": 30, "40 x 80": 35 };
 
-    // SOLEIRA
-    const valorMetroSoleira = { "30 x 50": 25, "40 x 60": 30, "40 x 80": 35 }[regra.soleira];
-    const valorSoleira = larguraM * valorMetroSoleira;
+    const valorEixo = larguraM * eixoValorMetro[regra.eixo];
+    const valorSoleira = larguraM * soleiraValorMetro[regra.soleira];
 
-    // TIRAS
-    const numeroTiras = Math.ceil(alturaCm / 7.5);
-    const valorTiraMetro = {
-        perfurada_080: 12,
-        perfurada_060: 10,
-        lisa_080: 11,
-        lisa_070: 9
-    }[document.getElementById("modeloTira").value];
+    const tiras = Math.ceil(altura / 7.5);
+    const valorTiras = tiras * larguraM * Number(document.getElementById("tira").value);
 
-    const valorTiras = numeroTiras * larguraM * valorTiraMetro;
-
-    // KIT GUIA
     const kitQtd = Number(document.getElementById("kitQtd").value);
-    const kitTipo = document.getElementById("kitTipo").value;
-    const valorKitMetro = kitTipo === "100" ? 230 : 280;
-    const valorKit = kitQtd * valorKitMetro;
+    const kitTipo = Number(document.getElementById("kitTipo").value);
+    const valorKit = kitQtd * kitTipo;
 
-    // COBRE ROLO
-    const valorCobreRolo = larguraM * 200;
+    const pintura = document.getElementById("pintura").checked ? area * 70 : 0;
+    const centrais = Number(document.getElementById("centrais").value) * 250;
+    const mao = Number(document.getElementById("mao").value);
+    const cobreRolo = larguraM * 200;
 
-    // PINTURA EPÓXI (CORRETA)
-    const comPintura = document.getElementById("pintura").checked;
-    const valorPintura = comPintura ? metragem * 70 : 0;
-
-    // CENTRAL
-    const valorCentral = Number(document.getElementById("centrais").value) * 250;
-
-    // MÃO DE OBRA
-    const maoObra = Number(document.getElementById("maoObra").value);
-
-    // SUBTOTAL
     const subtotal =
         regra.preco +
         valorEixo +
         valorSoleira +
         valorTiras +
         valorKit +
-        valorCobreRolo +
-        valorPintura +
-        valorCentral +
-        maoObra;
+        cobreRolo +
+        pintura +
+        centrais +
+        mao;
 
-    // NOTA FISCAL
     const nf = subtotal * 0.10;
-    const totalFinal = subtotal + nf;
+    const total = subtotal + nf;
 
     document.getElementById("resultado").innerHTML = `
-        <div class="linha"><strong>Metragem:</strong> ${metragem.toFixed(2)} m²</div>
-        <div class="linha"><strong>Motor:</strong> ${regra.motor} – R$ ${regra.preco.toFixed(2)}</div>
-        <div class="linha"><strong>Eixo (${regra.eixo}):</strong> R$ ${valorEixo.toFixed(2)}</div>
-        <div class="linha"><strong>Soleira (${regra.soleira}):</strong> R$ ${valorSoleira.toFixed(2)}</div>
-        <div class="linha"><strong>Tiras (${numeroTiras} un):</strong> R$ ${valorTiras.toFixed(2)}</div>
-        <div class="linha"><strong>Kit Guia:</strong> R$ ${valorKit.toFixed(2)}</div>
-        <div class="linha"><strong>Cobre-rolo:</strong> R$ ${valorCobreRolo.toFixed(2)}</div>
-        <div class="linha"><strong>Pintura epóxi:</strong> R$ ${valorPintura.toFixed(2)}</div>
-        <div class="linha"><strong>Centrais:</strong> R$ ${valorCentral.toFixed(2)}</div>
-        <div class="linha"><strong>Mão de obra:</strong> R$ ${maoObra.toFixed(2)}</div>
-        <hr>
-        <div class="linha"><strong>Subtotal:</strong> R$ ${subtotal.toFixed(2)}</div>
-        <div class="linha"><strong>NF (10%):</strong> R$ ${nf.toFixed(2)}</div>
-        <div class="linha"><strong>Total Final:</strong> R$ ${totalFinal.toFixed(2)}</div>
+        <table>
+            <tr><td class="desc">Motor ${regra.motor} kg</td><td class="valor">${moeda(regra.preco)}</td></tr>
+            <tr><td class="desc">Eixo ${regra.eixo}"</td><td class="valor">${moeda(valorEixo)}</td></tr>
+            <tr><td class="desc">Soleira ${regra.soleira}</td><td class="valor">${moeda(valorSoleira)}</td></tr>
+            <tr><td class="desc">Tiras (${tiras} un.)</td><td class="valor">${moeda(valorTiras)}</td></tr>
+            <tr><td class="desc">Kit guia</td><td class="valor">${moeda(valorKit)}</td></tr>
+            <tr><td class="desc">Cobre rolo</td><td class="valor">${moeda(cobreRolo)}</td></tr>
+            <tr><td class="desc">Pintura epóxi</td><td class="valor">${moeda(pintura)}</td></tr>
+            <tr><td class="desc">Centrais</td><td class="valor">${moeda(centrais)}</td></tr>
+            <tr><td class="desc">Mão de obra</td><td class="valor">${moeda(mao)}</td></tr>
+
+            <tr class="linha-nf">
+                <td class="desc">Nota Fiscal (10%)</td>
+                <td class="valor">${moeda(nf)}</td>
+            </tr>
+
+            <tr class="linha-total">
+                <td class="desc">TOTAL</td>
+                <td class="valor">${moeda(total)}</td>
+            </tr>
+        </table>
     `;
 }
 </script>
