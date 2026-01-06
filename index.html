@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Orçamento – Cortina Automatizada</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h2, h3 { margin-top: 20px; }
+        input, select { margin: 5px 0; width: 220px; padding: 5px; }
+        button { margin-top: 15px; padding: 10px 20px; font-size: 16px; }
+        .resumo { margin-top: 25px; padding: 15px; border: 1px solid #ccc; }
+        .linha { margin-bottom: 6px; }
+        hr { margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<h2>Orçamento – Cortina Automatizada</h2>
+
+<h3>Medidas</h3>
+Largura (cm):<br>
+<input type="number" id="largura"><br>
+
+Altura (cm):<br>
+<input type="number" id="altura"><br>
+
+<h3>Tiras</h3>
+Modelo da tira:<br>
+<select id="modeloTira">
+    <option value="perfurada_080">Perfurada 0,80</option>
+    <option value="perfurada_060">Perfurada 0,60</option>
+    <option value="lisa_080">Lisa 0,80</option>
+    <option value="lisa_070">Lisa 0,70</option>
+</select>
+
+<h3>Kit Guia</h3>
+Tipo:<br>
+<select id="kitTipo">
+    <option value="100">Kit 100</option>
+    <option value="130">Kit 130</option>
+</select><br>
+
+Quantidade:<br>
+<input type="number" id="kitQtd" value="0">
+
+<h3>Outros</h3>
+<input type="checkbox" id="pintura"> Com pintura epóxi<br><br>
+
+Centrais (R$ 250 cada):<br>
+<input type="number" id="centrais" value="0"><br>
+
+Mão de obra (R$):<br>
+<input type="number" id="maoObra" value="0"><br>
+
+<button onclick="calcular()">Calcular Orçamento</button>
+
+<div class="resumo" id="resultado"></div>
+
+<script>
+function calcular() {
+    const larguraCm = Number(document.getElementById("largura").value);
+    const alturaCm = Number(document.getElementById("altura").value);
+
+    const larguraM = larguraCm / 100;
+
+    // METRAGEM (m²)
+    const metragem = (larguraCm * alturaCm) / 10000;
+
+    // REGRAS FIXAS MOTOR / EIXO / SOLEIRA
+    const regras = [
+        { ate: 10, motor: 200, preco: 800, eixo: "4,5", soleira: "30 x 50" },
+        { ate: 14, motor: 300, preco: 900, eixo: "4,5", soleira: "30 x 50" },
+        { ate: 20, motor: 500, preco: 1000, eixo: "5,5", soleira: "40 x 60" },
+        { ate: 25, motor: 600, preco: 1150, eixo: "5,5", soleira: "40 x 60" },
+        { ate: 30, motor: 800, preco: 2250, eixo: "8.0", soleira: "40 x 80" },
+        { ate: 36, motor: 1000, preco: 2750, eixo: "8.0", soleira: "40 x 80" },
+        { ate: 49, motor: 1500, preco: 4250, eixo: "8.0", soleira: "40 x 80" },
+        { ate: 60, motor: 2000, preco: 5500, eixo: "8.0", soleira: "40 x 80" }
+    ];
+
+    const regra = regras.find(r => metragem <= r.ate);
+    if (!regra) {
+        document.getElementById("resultado").innerHTML =
+            "<strong>Medida acima do limite permitido.</strong>";
+        return;
+    }
+
+    // EIXO
+    const valorMetroEixo = { "4,5": 60, "5,5": 85, "8.0": 163 }[regra.eixo];
+    const valorEixo = larguraM * valorMetroEixo;
+
+    // SOLEIRA
+    const valorMetroSoleira = { "30 x 50": 25, "40 x 60": 30, "40 x 80": 35 }[regra.soleira];
+    const valorSoleira = larguraM * valorMetroSoleira;
+
+    // TIRAS
+    const numeroTiras = Math.ceil(alturaCm / 7.5);
+    const valorTiraMetro = {
+        perfurada_080: 12,
+        perfurada_060: 10,
+        lisa_080: 11,
+        lisa_070: 9
+    }[document.getElementById("modeloTira").value];
+
+    const valorTiras = numeroTiras * larguraM * valorTiraMetro;
+
+    // KIT GUIA
+    const kitQtd = Number(document.getElementById("kitQtd").value);
+    const kitTipo = document.getElementById("kitTipo").value;
+    const valorKitMetro = kitTipo === "100" ? 230 : 280;
+    const valorKit = kitQtd * valorKitMetro;
+
+    // COBRE ROLO
+    const valorCobreRolo = larguraM * 200;
+
+    // PINTURA EPÓXI (CORRETA)
+    const comPintura = document.getElementById("pintura").checked;
+    const valorPintura = comPintura ? metragem * 70 : 0;
+
+    // CENTRAL
+    const valorCentral = Number(document.getElementById("centrais").value) * 250;
+
+    // MÃO DE OBRA
+    const maoObra = Number(document.getElementById("maoObra").value);
+
+    // SUBTOTAL
+    const subtotal =
+        regra.preco +
+        valorEixo +
+        valorSoleira +
+        valorTiras +
+        valorKit +
+        valorCobreRolo +
+        valorPintura +
+        valorCentral +
+        maoObra;
+
+    // NOTA FISCAL
+    const nf = subtotal * 0.10;
+    const totalFinal = subtotal + nf;
+
+    document.getElementById("resultado").innerHTML = `
+        <div class="linha"><strong>Metragem:</strong> ${metragem.toFixed(2)} m²</div>
+        <div class="linha"><strong>Motor:</strong> ${regra.motor} – R$ ${regra.preco.toFixed(2)}</div>
+        <div class="linha"><strong>Eixo (${regra.eixo}):</strong> R$ ${valorEixo.toFixed(2)}</div>
+        <div class="linha"><strong>Soleira (${regra.soleira}):</strong> R$ ${valorSoleira.toFixed(2)}</div>
+        <div class="linha"><strong>Tiras (${numeroTiras} un):</strong> R$ ${valorTiras.toFixed(2)}</div>
+        <div class="linha"><strong>Kit Guia:</strong> R$ ${valorKit.toFixed(2)}</div>
+        <div class="linha"><strong>Cobre-rolo:</strong> R$ ${valorCobreRolo.toFixed(2)}</div>
+        <div class="linha"><strong>Pintura epóxi:</strong> R$ ${valorPintura.toFixed(2)}</div>
+        <div class="linha"><strong>Centrais:</strong> R$ ${valorCentral.toFixed(2)}</div>
+        <div class="linha"><strong>Mão de obra:</strong> R$ ${maoObra.toFixed(2)}</div>
+        <hr>
+        <div class="linha"><strong>Subtotal:</strong> R$ ${subtotal.toFixed(2)}</div>
+        <div class="linha"><strong>NF (10%):</strong> R$ ${nf.toFixed(2)}</div>
+        <div class="linha"><strong>Total Final:</strong> R$ ${totalFinal.toFixed(2)}</div>
+    `;
+}
+</script>
+
+</body>
+</html>
