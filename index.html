@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <title>Orçamento APS</title>
 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -22,6 +24,10 @@ body {
 label {
     display: inline-block;
     width: 180px;
+}
+
+input, select {
+    padding: 5px;
 }
 
 button {
@@ -104,6 +110,54 @@ td {
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
+
+/* ===== RESPONSIVO CELULAR ===== */
+@media (max-width: 600px) {
+
+    body {
+        margin: 10px;
+        font-size: 15px;
+    }
+
+    .input-box, .resultado-box, .historico-box {
+        max-width: 100%;
+        padding: 12px;
+    }
+
+    label {
+        width: 100%;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 8px;
+        font-size: 16px;
+    }
+
+    .botoes-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .botoes-esquerda button,
+    .botoes-direita button {
+        width: 100%;
+        font-size: 16px;
+    }
+
+    table td {
+        font-size: 14px;
+    }
+
+    .botao-historico {
+        bottom: 15px;
+        right: 15px;
+        padding: 14px 20px;
+        font-size: 16px;
+    }
+}
 </style>
 </head>
 
@@ -153,7 +207,6 @@ td {
         <button onclick="calcular()">Calcular</button>
         <button onclick="limpar()">Limpar</button>
     </div>
-
     <div class="botoes-direita">
         <button onclick="salvarOrcamento()">Salvar</button>
     </div>
