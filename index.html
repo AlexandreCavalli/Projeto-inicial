@@ -11,28 +11,22 @@ body {
     font-size: 14px;
 }
 
-.input-box {
+.input-box, .resultado-box, .historico-box {
     border: 1px solid #ccc;
     padding: 15px;
     background: #f9f9f9;
-    max-width: 600px;
+    max-width: 650px;
     margin: 0 auto 20px auto;
 }
 
 label {
     display: inline-block;
-    width: 160px;
+    width: 180px;
 }
 
 button {
-    padding: 8px 15px;
-    margin-top: 10px;
+    padding: 8px 14px;
     cursor: pointer;
-}
-
-.resultado-box {
-    max-width: 600px;
-    margin: 0 auto;
 }
 
 table {
@@ -44,15 +38,8 @@ td {
     padding: 6px 4px;
 }
 
-.desc {
-    width: 65%;
-}
-
-.valor {
-    width: 35%;
-    text-align: right;
-    white-space: nowrap;
-}
+.desc { width: 65%; }
+.valor { width: 35%; text-align: right; }
 
 .linha-nf td {
     border-top: 1px dashed #999;
@@ -64,64 +51,145 @@ td {
     font-weight: bold;
     font-size: 18px;
 }
+
+/* BOTÕES */
+.botoes-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.botoes-esquerda button {
+    margin-right: 5px;
+}
+
+.botoes-direita {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* HISTÓRICO */
+.historico-box {
+    display: none;
+}
+
+.historico-item {
+    border-bottom: 1px solid #ddd;
+    padding: 6px 0;
+}
+
+.btn-excluir {
+    background: #b30000;
+    color: white;
+    border: none;
+    padding: 3px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    display: none;
+    margin-left: 10px;
+}
+
+/* BOTÃO HISTÓRICO FLUTUANTE */
+.botao-historico {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #b30000;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
 </style>
 </head>
 
 <body>
 
 <div class="input-box">
-    <strong>Cálculo do orçamento</strong><br><br>
+<strong>Cálculo do orçamento</strong><br><br>
 
-    <label>Largura (cm):</label>
-    <input type="number" id="largura"><br><br>
+<label>Cliente:</label>
+<input type="text" id="cliente"><br><br>
 
-    <label>Altura (cm):</label>
-    <input type="number" id="altura"><br><br>
+<label>Largura (cm):</label>
+<input type="number" id="largura"><br><br>
 
-    <label>Modelo da tira:</label>
-    <select id="tira">
-        <option value="12">Perfurada 0,80</option>
-        <option value="10">Perfurada 0,60</option>
-        <option value="11">Lisa 0,80</option>
-        <option value="9">Lisa 0,70</option>
-    </select><br><br>
+<label>Altura (cm):</label>
+<input type="number" id="altura"><br><br>
 
-    <label>Kit guia:</label>
-    <select id="kitTipo">
-        <option value="230">Kit 100</option>
-        <option value="280">Kit 130</option>
-    </select>
-    <input type="number" id="kitQtd" value="0"><br><br>
+<label>Modelo da tira:</label>
+<select id="tira">
+    <option value="12">Perfurada 0,80</option>
+    <option value="10">Perfurada 0,60</option>
+    <option value="11">Lisa 0,80</option>
+    <option value="9">Lisa 0,70</option>
+</select><br><br>
 
-    <label>Com pintura epóxi:</label>
-    <input type="checkbox" id="pintura"><br><br>
+<label>Kit guia:</label>
+<select id="kitTipo">
+    <option value="230">Kit 100</option>
+    <option value="280">Kit 130</option>
+</select>
+<input type="number" id="kitQtd" value="0"><br><br>
 
-    <label>Centrais:</label>
-    <input type="number" id="centrais" value="0"><br><br>
+<label>Com pintura epóxi:</label>
+<input type="checkbox" id="pintura"><br><br>
 
-    <label>Mão de obra (R$):</label>
-    <input type="number" id="mao" value="0"><br><br>
+<label>Pagamento 3x cartão (9%):</label>
+<input type="checkbox" id="cartao"><br><br>
 
-    <button onclick="calcular()">Calcular</button>
+<label>Centrais:</label>
+<input type="number" id="centrais" value="0"><br><br>
+
+<label>Mão de obra (R$):</label>
+<input type="number" id="mao" value="0"><br><br>
+
+<div class="botoes-container">
+    <div class="botoes-esquerda">
+        <button onclick="calcular()">Calcular</button>
+        <button onclick="limpar()">Limpar</button>
+    </div>
+
+    <div class="botoes-direita">
+        <button onclick="salvarOrcamento()">Salvar</button>
+    </div>
+</div>
+
+<div id="msgSalvo" style="display:none;color:green;margin-top:10px;font-weight:bold">
+✔ Orçamento salvo no histórico
+</div>
 </div>
 
 <div id="resultado" class="resultado-box"></div>
 
+<div id="historicoBox" class="historico-box">
+<strong>Histórico de Orçamentos</strong><br><br>
+<button onclick="toggleExcluir()">Gerenciar histórico</button><br><br>
+<div id="historico"></div>
+</div>
+
+<button class="botao-historico" onclick="toggleHistorico()">📄 Histórico</button>
+
 <script>
-function moeda(valor) {
-    return valor.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL"
-    });
+let ultimoOrcamento = null;
+let modoExcluir = false;
+
+function moeda(v) {
+    return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 function calcular() {
 
+    const cliente = document.getElementById("cliente").value;
     const largura = Number(document.getElementById("largura").value);
     const altura = Number(document.getElementById("altura").value);
 
-    if (!largura || !altura) {
-        alert("Preencha largura e altura.");
+    if (!cliente || !largura || !altura) {
+        alert("Preencha cliente, largura e altura.");
         return;
     }
 
@@ -141,62 +209,113 @@ function calcular() {
 
     const regra = regras.find(r => area <= r.ate);
 
-    const eixoValorMetro = { "4,5": 60, "5,5": 85, "8.0": 163 };
-    const soleiraValorMetro = { "30 x 50": 25, "40 x 60": 30, "40 x 80": 35 };
+    const eixoValor = { "4,5": 60, "5,5": 85, "8.0": 163 };
+    const soleiraValor = { "30 x 50": 25, "40 x 60": 30, "40 x 80": 35 };
 
-    const valorEixo = larguraM * eixoValorMetro[regra.eixo];
-    const valorSoleira = larguraM * soleiraValorMetro[regra.soleira];
+    const valorEixo = larguraM * eixoValor[regra.eixo];
+    const valorSoleira = larguraM * soleiraValor[regra.soleira];
 
     const tiras = Math.ceil(altura / 7.5);
     const valorTiras = tiras * larguraM * Number(document.getElementById("tira").value);
 
-    const kitQtd = Number(document.getElementById("kitQtd").value);
-    const kitTipo = Number(document.getElementById("kitTipo").value);
-    const valorKit = kitQtd * kitTipo;
-
+    const valorKit = Number(document.getElementById("kitQtd").value) * Number(document.getElementById("kitTipo").value);
     const pintura = document.getElementById("pintura").checked ? area * 70 : 0;
     const centrais = Number(document.getElementById("centrais").value) * 250;
     const mao = Number(document.getElementById("mao").value);
     const cobreRolo = larguraM * 200;
 
-    const subtotal =
-        regra.preco +
-        valorEixo +
-        valorSoleira +
-        valorTiras +
-        valorKit +
-        cobreRolo +
-        pintura +
-        centrais +
-        mao;
+    const subtotalItens =
+        regra.preco + valorEixo + valorSoleira + valorTiras +
+        valorKit + pintura + centrais + mao + cobreRolo;
 
-    const nf = subtotal * 0.10;
-    const total = subtotal + nf;
+    const nf = subtotalItens * 0.10;
+    const subtotal = subtotalItens + nf;
+    const taxaCartao = document.getElementById("cartao").checked ? subtotal * 0.09 : 0;
+    const total = subtotal + taxaCartao;
 
     document.getElementById("resultado").innerHTML = `
-        <table>
-            <tr><td class="desc">Motor ${regra.motor} kg</td><td class="valor">${moeda(regra.preco)}</td></tr>
-            <tr><td class="desc">Eixo ${regra.eixo}"</td><td class="valor">${moeda(valorEixo)}</td></tr>
-            <tr><td class="desc">Soleira ${regra.soleira}</td><td class="valor">${moeda(valorSoleira)}</td></tr>
-            <tr><td class="desc">Tiras (${tiras} un.)</td><td class="valor">${moeda(valorTiras)}</td></tr>
-            <tr><td class="desc">Kit guia</td><td class="valor">${moeda(valorKit)}</td></tr>
-            <tr><td class="desc">Cobre rolo</td><td class="valor">${moeda(cobreRolo)}</td></tr>
-            <tr><td class="desc">Pintura epóxi</td><td class="valor">${moeda(pintura)}</td></tr>
-            <tr><td class="desc">Centrais</td><td class="valor">${moeda(centrais)}</td></tr>
-            <tr><td class="desc">Mão de obra</td><td class="valor">${moeda(mao)}</td></tr>
+    <table>
+        <tr><td class="desc">Motor ${regra.motor} kg</td><td class="valor">${moeda(regra.preco)}</td></tr>
+        <tr><td class="desc">Eixo ${regra.eixo}"</td><td class="valor">${moeda(valorEixo)}</td></tr>
+        <tr><td class="desc">Soleira ${regra.soleira}</td><td class="valor">${moeda(valorSoleira)}</td></tr>
+        <tr><td class="desc">Tiras (${tiras} un.)</td><td class="valor">${moeda(valorTiras)}</td></tr>
+        <tr><td class="desc">Kit guia</td><td class="valor">${moeda(valorKit)}</td></tr>
+        <tr><td class="desc">Cobre rolo</td><td class="valor">${moeda(cobreRolo)}</td></tr>
+        <tr><td class="desc">Pintura epóxi</td><td class="valor">${moeda(pintura)}</td></tr>
+        <tr><td class="desc">Centrais</td><td class="valor">${moeda(centrais)}</td></tr>
+        <tr><td class="desc">Mão de obra</td><td class="valor">${moeda(mao)}</td></tr>
+        <tr class="linha-nf"><td class="desc">Nota Fiscal (10%)</td><td class="valor">${moeda(nf)}</td></tr>
+        <tr><td class="desc">Taxa cartão (9%)</td><td class="valor">${moeda(taxaCartao)}</td></tr>
+        <tr class="linha-total"><td class="desc">TOTAL</td><td class="valor">${moeda(total)}</td></tr>
+    </table>`;
 
-            <tr class="linha-nf">
-                <td class="desc">Nota Fiscal (10%)</td>
-                <td class="valor">${moeda(nf)}</td>
-            </tr>
-
-            <tr class="linha-total">
-                <td class="desc">TOTAL</td>
-                <td class="valor">${moeda(total)}</td>
-            </tr>
-        </table>
-    `;
+    const agora = new Date();
+    ultimoOrcamento = {
+        cliente,
+        data: agora.toLocaleDateString("pt-BR") + " " +
+              agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+        total
+    };
 }
+
+function salvarOrcamento() {
+    if (!ultimoOrcamento) return;
+    const lista = JSON.parse(localStorage.getItem("orcamentos") || "[]");
+    lista.push(ultimoOrcamento);
+    localStorage.setItem("orcamentos", JSON.stringify(lista));
+    carregarHistorico();
+    document.getElementById("msgSalvo").style.display = "block";
+    setTimeout(() => document.getElementById("msgSalvo").style.display = "none", 2000);
+}
+
+function carregarHistorico() {
+    const lista = JSON.parse(localStorage.getItem("orcamentos") || "[]");
+    const h = document.getElementById("historico");
+    h.innerHTML = "";
+    lista.forEach((o, i) => {
+        h.innerHTML += `
+        <div class="historico-item">
+            ${o.cliente} – ${o.data} – ${moeda(o.total)}
+            <button class="btn-excluir" onclick="excluir(${i})">Excluir</button>
+        </div>`;
+    });
+    atualizarExcluir();
+}
+
+function toggleHistorico() {
+    const box = document.getElementById("historicoBox");
+    box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+function toggleExcluir() {
+    modoExcluir = !modoExcluir;
+    atualizarExcluir();
+}
+
+function atualizarExcluir() {
+    document.querySelectorAll(".btn-excluir").forEach(b =>
+        b.style.display = modoExcluir ? "inline-block" : "none"
+    );
+}
+
+function excluir(i) {
+    if (!confirm("Excluir orçamento?")) return;
+    const lista = JSON.parse(localStorage.getItem("orcamentos"));
+    lista.splice(i, 1);
+    localStorage.setItem("orcamentos", JSON.stringify(lista));
+    carregarHistorico();
+}
+
+function limpar() {
+    document.querySelectorAll("input").forEach(i => {
+        if (i.type === "checkbox") i.checked = false;
+        else i.value = "";
+    });
+    document.getElementById("resultado").innerHTML = "";
+    ultimoOrcamento = null;
+}
+
+carregarHistorico();
 </script>
 
 </body>
