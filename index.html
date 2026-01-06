@@ -109,6 +109,12 @@ td {
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 999;
+}
+
+/* Espaço extra para não cobrir TOTAL */
+.resultado-box {
+    margin-bottom: 120px;
 }
 
 /* ===== RESPONSIVO CELULAR ===== */
@@ -151,9 +157,9 @@ td {
         font-size: 14px;
     }
 
+    /* sobe o botão no mobile */
     .botao-historico {
-        bottom: 15px;
-        right: 15px;
+        bottom: 90px;
         padding: 14px 20px;
         font-size: 16px;
     }
@@ -236,7 +242,6 @@ function moeda(v) {
 }
 
 function calcular() {
-
     const cliente = document.getElementById("cliente").value;
     const largura = Number(document.getElementById("largura").value);
     const altura = Number(document.getElementById("altura").value);
