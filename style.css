@@ -206,23 +206,42 @@ td {
     .botoes-container {
         flex-direction: column;
         gap: 12px;
+        
+        
+        
     }
 
-    .botoes-esquerda button,
-    .botoes-direita button {
-        width: 100%;
-        font-size: 16px;
-    }
+    .botoes-esquerda,
+.botoes-direita {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* espaço entre os botões */
+}
+
+.botoes-esquerda button,
+.botoes-direita button {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px;
+}
+
 
     table td {
         font-size: 14px;
     }
 
+
     .botao-historico {
-        bottom: 90px;
-        font-size: 16px;
+        position: static;      /* deixa de ser flutuante */
+        width: 100%;
+        margin-top: 15px;
+        font-size: 14px;
+        opacity: 0.9;
     }
+
 }
+
+
 
 /* ===== DARK MODE ===== */
 body.dark {
@@ -321,4 +340,5 @@ body.dark .btn-excluir {
     text-align: end;
     font-size: 20px;
 }
+
 
