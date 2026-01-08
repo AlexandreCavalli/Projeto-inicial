@@ -1,0 +1,324 @@
+/* ===== BASE ===== */
+
+* {
+    margin: 0;
+    padding: 0;
+    
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 20px;
+    font-size: 14px;
+    background: #f3f4f6;
+    color: #333;
+}
+
+/* ===== CAIXAS ===== */
+.input-box,
+.resultado-box,
+.historico-box {
+    border: 1px solid #e1e1e1;
+    padding: 18px;
+    background: #ffffff;
+    max-width: 650px;
+    margin: 0 auto 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+/* ===== FORM ===== */
+label {
+    display: inline-block;
+    width: 180px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+input,
+select {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #b30000;
+    box-shadow: 0 0 0 2px rgba(179,0,0,0.15);
+}
+
+/* ===== BOTÕES ===== */
+button {
+    padding: 10px 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+}
+
+/* Botões padrão */
+.botoes-esquerda button {
+    background: #e5e7eb;
+    color: #333;
+}
+
+.botoes-esquerda button:hover {
+    background: #d1d5db;
+}
+
+/* Botões principais */
+.botoes-direita button {
+    background: #b30000;
+    color: #fff;
+}
+
+.botoes-direita button:hover {
+    background: #8f0000;
+}
+
+/* ===== TABELA ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+td {
+    padding: 8px 6px;
+    border-bottom: 1px solid #eee;
+}
+
+.desc {
+    width: 65%;
+}
+
+.valor {
+    width: 35%;
+    text-align: right;
+    font-weight: 500;
+}
+
+/* ===== LINHAS ESPECIAIS ===== */
+.linha-nf td {
+    border-top: 1px dashed #bbb;
+    color: #555;
+}
+
+.linha-total td {
+    border-top: 3px solid #b30000;
+    color: #b30000;
+    font-weight: 700;
+    font-size: 20px;
+    background: #fff5f5;
+}
+
+/* ===== BOTÕES CONTAINER ===== */
+.botoes-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.botoes-esquerda button {
+    margin-right: 8px;
+}
+
+/* ===== HISTÓRICO ===== */
+.historico-box {
+    display: none;
+}
+
+.historico-item {
+    border-bottom: 1px solid #eee;
+    padding: 8px 0;
+    font-size: 13px;
+}
+
+.btn-excluir {
+    background: #b30000;
+    color: #fff;
+    border: none;
+    padding: 4px 10px;
+    font-size: 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: none;
+}
+
+.btn-excluir:hover {
+    background: #8f0000;
+}
+
+/* ===== BOTÃO HISTÓRICO FLUTUANTE ===== */
+.botao-historico {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #b30000;
+    color: #fff;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    z-index: 999;
+}
+
+.botao-historico:hover {
+    background: #8f0000;
+}
+
+/* Espaço extra para não cobrir TOTAL */
+.resultado-box {
+    margin-bottom: 120px;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 600px) {
+
+    body {
+        margin: 10px;
+        font-size: 15px;
+    }
+
+    label {
+        width: 100%;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    input,
+    select {
+        width: 100%;
+        font-size: 16px;
+    }
+
+    .botoes-container {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .botoes-esquerda button,
+    .botoes-direita button {
+        width: 100%;
+        font-size: 16px;
+    }
+
+    table td {
+        font-size: 14px;
+    }
+
+    .botao-historico {
+        bottom: 90px;
+        font-size: 16px;
+    }
+}
+
+/* ===== DARK MODE ===== */
+body.dark {
+    background: #0f1115;
+    color: #e5e7eb;
+}
+
+/* Caixas */
+body.dark .input-box,
+body.dark .resultado-box,
+body.dark .historico-box {
+    background: #161a22;
+    border-color: #2a2f3a;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+}
+
+/* Labels e textos */
+body.dark label {
+    color: #cbd5e1;
+}
+
+/* Inputs */
+body.dark input,
+body.dark select {
+    background: #0f1115;
+    color: #e5e7eb;
+    border: 1px solid #2a2f3a;
+}
+
+body.dark input::placeholder {
+    color: #9ca3af;
+}
+
+body.dark input:focus,
+body.dark select:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239,68,68,0.25);
+}
+
+/* Tabela */
+body.dark table td {
+    border-bottom: 1px solid #2a2f3a;
+}
+
+body.dark .linha-nf td {
+    border-top: 1px dashed #475569;
+}
+
+body.dark .linha-total td {
+    background: #1f2933;
+    color: #f87171;
+    border-top: 3px solid #ef4444;
+}
+
+/* Botões */
+body.dark .botoes-esquerda button {
+    background: #2a2f3a;
+    color: #e5e7eb;
+}
+
+body.dark .botoes-esquerda button:hover {
+    background: #374151;
+}
+
+body.dark .botoes-direita button,
+body.dark .botao-historico {
+    background: #ef4444;
+}
+
+body.dark .botoes-direita button:hover,
+body.dark .botao-historico:hover {
+    background: #dc2626;
+}
+
+/* Histórico */
+body.dark .historico-item {
+    border-bottom: 1px solid #2a2f3a;
+}
+
+/* Botão excluir */
+body.dark .btn-excluir {
+    background: #ef4444;
+}
+
+#orcamento {
+    width: 50%;
+    margin: auto;      /* centraliza o div */
+    text-align: center; /* centraliza o conteúdo */
+    font-size: 17px;
+    font-weight: bolder;
+}
+
+#vermelho {
+    background-color: #b30000;
+    color: white;
+    text-align: end;
+    font-size: 20px;
+}
+

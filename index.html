@@ -3,174 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <title>Orçamento APS</title>
-
+<link rel="stylesheet" href="style.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    font-size: 14px;
-}
 
-.input-box, .resultado-box, .historico-box {
-    border: 1px solid #ccc;
-    padding: 15px;
-    background: #f9f9f9;
-    max-width: 650px;
-    margin: 0 auto 20px auto;
-}
-
-label {
-    display: inline-block;
-    width: 180px;
-}
-
-input, select {
-    padding: 5px;
-}
-
-button {
-    padding: 8px 14px;
-    cursor: pointer;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-td {
-    padding: 6px 4px;
-}
-
-.desc { width: 65%; }
-.valor { width: 35%; text-align: right; }
-
-.linha-nf td {
-    border-top: 1px dashed #999;
-}
-
-.linha-total td {
-    border-top: 2px solid #b30000;
-    color: #b30000;
-    font-weight: bold;
-    font-size: 18px;
-}
-
-/* BOTÕES */
-.botoes-container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 15px;
-}
-
-.botoes-esquerda button {
-    margin-right: 5px;
-}
-
-.botoes-direita {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-/* HISTÓRICO */
-.historico-box {
-    display: none;
-}
-
-.historico-item {
-    border-bottom: 1px solid #ddd;
-    padding: 6px 0;
-}
-
-.btn-excluir {
-    background: #b30000;
-    color: white;
-    border: none;
-    padding: 3px 8px;
-    font-size: 11px;
-    cursor: pointer;
-    display: none;
-    margin-left: 10px;
-}
-
-/* BOTÃO HISTÓRICO FLUTUANTE */
-.botao-historico {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #b30000;
-    color: white;
-    border: none;
-    padding: 12px 18px;
-    border-radius: 50px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    z-index: 999;
-}
-
-/* Espaço extra para não cobrir TOTAL */
-.resultado-box {
-    margin-bottom: 120px;
-}
-
-/* ===== RESPONSIVO CELULAR ===== */
-@media (max-width: 600px) {
-
-    body {
-        margin: 10px;
-        font-size: 15px;
-    }
-
-    .input-box, .resultado-box, .historico-box {
-        max-width: 100%;
-        padding: 12px;
-    }
-
-    label {
-        width: 100%;
-        display: block;
-        margin-bottom: 4px;
-    }
-
-    input, select {
-        width: 100%;
-        padding: 8px;
-        font-size: 16px;
-    }
-
-    .botoes-container {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .botoes-esquerda button,
-    .botoes-direita button {
-        width: 100%;
-        font-size: 16px;
-    }
-
-    table td {
-        font-size: 14px;
-    }
-
-    /* sobe o botão no mobile */
-    .botao-historico {
-        bottom: 90px;
-        padding: 14px 20px;
-        font-size: 16px;
-    }
-}
-</style>
 </head>
 
 <body>
+    <button onclick="toggleDarkMode()" id="btnDark">
+    🌙 Modo escuro
+</button>
 
 <div class="input-box">
-<strong>Cálculo do orçamento</strong><br><br>
+<strong>Cálculo Orçamento Cortinas</strong><br><br>
 
 <label>Cliente:</label>
 <input type="text" id="cliente"><br><br>
@@ -194,7 +39,7 @@ td {
     <option value="230">Kit 100</option>
     <option value="280">Kit 130</option>
 </select>
-<input type="number" id="kitQtd" value="0"><br><br>
+<input type="number" id="kitQtd" ><br><br>
 
 <label>Com pintura epóxi:</label>
 <input type="checkbox" id="pintura"><br><br>
@@ -203,10 +48,10 @@ td {
 <input type="checkbox" id="cartao"><br><br>
 
 <label>Centrais:</label>
-<input type="number" id="centrais" value="0"><br><br>
+<input type="number" id="centrais" ><br><br>
 
 <label>Mão de obra (R$):</label>
-<input type="number" id="mao" value="0"><br><br>
+<input type="number" id="mao" ><br><br>
 
 <div class="botoes-container">
     <div class="botoes-esquerda">
@@ -215,6 +60,7 @@ td {
     </div>
     <div class="botoes-direita">
         <button onclick="salvarOrcamento()">Salvar</button>
+        <button onclick="imprimir()">Enviar Cliente</button>
     </div>
 </div>
 
@@ -292,6 +138,7 @@ function calcular() {
     const total = subtotal + taxaCartao;
 
     document.getElementById("resultado").innerHTML = `
+    
     <table>
         <tr><td class="desc">Motor ${regra.motor} kg</td><td class="valor">${moeda(regra.preco)}</td></tr>
         <tr><td class="desc">Eixo ${regra.eixo}"</td><td class="valor">${moeda(valorEixo)}</td></tr>
@@ -340,6 +187,8 @@ function carregarHistorico() {
     atualizarExcluir();
 }
 
+
+
 function toggleHistorico() {
     const box = document.getElementById("historicoBox");
     box.style.display = box.style.display === "none" ? "block" : "none";
@@ -364,6 +213,24 @@ function excluir(i) {
     carregarHistorico();
 }
 
+function toggleDarkMode() {
+    document.body.classList.toggle('dark');
+
+    const isDark = document.body.classList.contains('dark');
+    localStorage.setItem('tema', isDark ? 'dark' : 'light');
+
+    document.getElementById('btnDark').innerText =
+        isDark ? '☀️ Modo claro' : '🌙 Modo escuro';
+}
+
+/* Carrega preferência salva */
+window.onload = () => {
+    if (localStorage.getItem('tema') === 'dark') {
+        document.body.classList.add('dark');
+        document.getElementById('btnDark').innerText = '☀️ Modo claro';
+    }
+};
+
 function limpar() {
     document.querySelectorAll("input").forEach(i => {
         if (i.type === "checkbox") i.checked = false;
@@ -373,7 +240,77 @@ function limpar() {
     ultimoOrcamento = null;
 }
 
-carregarHistorico();
+
+
+carregarHistorico()
+
+function imprimir() {
+    const resultado = document.getElementById("resultado");
+    const clientee = document.getElementById('cliente').value;
+    
+
+    if (!resultado.innerHTML.trim()) {
+        alert("Calcule o orçamento antes de imprimir.");
+        return;
+    }
+
+    // guarda o conteúdo original da página
+    const original = document.body.innerHTML;
+
+    // troca a página inteira só pelo resultado
+    document.body.innerHTML = `
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="container">
+        <div>
+            
+            <div id="vermelho">AC/ ${clientee}</div>
+            <u>APS - Soluções em Serralheria</u>
+            <p>Rua José Argenta, 127 – Caxias do Sul – RS </p>
+            <p>&#128383; 54 3227 2755 / 99978 7453 </p>
+            <a href="">contato@apsserralheria.com.br</a>
+            <p>www.apsserralheria.com.br</p>
+            <img src="images.jpg" alt="" width="150px">
+            <div id="orcamento">Orçamento</div>
+        <div style="padding:20px;font-family:Arial">
+            ${resultado.innerHTML}
+        </div>
+        <h3>Valor Orçado: ${moeda(ultimoOrcamento.total)}</h3>
+            <br>
+            <p>- Pagamento a vista: Entrada de 50% e restante na entrega</p>
+            <p>- Desconto para pagamento a vista de 8% R$</p>
+            <p>- Em até 12x no cartão com juros da máquina </p>
+            <p>- Orçamento valido por 10 dias.</p>
+
+            <br>
+            <p>PORTA DE AÇO AUTOMÁTICA, em chapa <b>transvision</b> espessura 0,80 galvanizada, MEIA-CANA com terminal com reforço em tubo, guias laterais de 60 x 90 mm, eixo tubo de aço 4.1/2”polegadas, com pontas de aço maciço,  MOTOR, (monofásico) 220 w 1720 RPM com capacidade de carga de 300 kg, freio eletromagnético, fim de curso, limitadores de paradas automáticas, com acionamento através de controle remoto e botoeira com três comandos (abre, para e fecha), sistema de correntes (talha manual) para emergência na falta de energia elétrica. Garantia de 1 ano. <b>Fabricação própria.</b>
+            Instalação no local determinado no prazo de 12 dias para cortinas sem pintura e 22 dias para cortinas com pintura.
+            <br><br>
+            </p>
+            <h4>Responsabilidade do cliente:</h4>
+            <br>
+            <p>- Deixar o local limpo e livre para o dia da instalação, caso haja algum objeto que impeça a instalação, a mesma será reagendada para os próximos 15dias.</p>
+            <p>- Deixar um ponto de energia para ligar o motor.</p>
+            <p>- Instalação ou condução da botoeira, tomada e elétrica fica por conta do proprietário.</p>
+            <p>- Caso o cliente opte por outra forma de esconder o rolo e motor, serão necessários dois acessos de 50x50cm para eventuais manutenções.</p>
+            <br>
+
+            <h4>ALGUNS DE NOSSOS CLIENTES</h4>
+            <img src="imagem-clientes.png" alt="" width="800px">
+    `;
+
+    window.print();
+
+    // volta a página ao normal
+    document.body.innerHTML = original;
+}
 </script>
 
 </body>
