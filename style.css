@@ -12,6 +12,14 @@ body {
     font-size: 14px;
     background: #f3f4f6;
     color: #333;
+    
+}
+
+@media print {
+    #vermelho {
+        -webkit-print-color-adjust: exact; /* Chrome/Safari/Edge */
+        print-color-adjust: exact;         /* Firefox */
+    }
 }
 
 /* ===== CAIXAS ===== */
