@@ -47,7 +47,7 @@
 <label>Pagamento 3x cartão (9%):</label>
 <input type="checkbox" id="cartao"><br><br>
 
-<label>Centrais:</label>
+<label>Sensor Anti Esmagamento</label>
 <input type="number" id="centrais" ><br><br>
 
 <label>Mão de obra (R$):</label>
@@ -80,6 +80,7 @@
 <button class="botao-historico" onclick="toggleHistorico()">📄 Histórico</button>
 
 <script>
+let qtd = {}
 let ultimoOrcamento = null;
 let modoExcluir = false;
 
@@ -124,7 +125,7 @@ function calcular() {
 
     const valorKit = Number(document.getElementById("kitQtd").value) * Number(document.getElementById("kitTipo").value);
     const pintura = document.getElementById("pintura").checked ? area * 70 : 0;
-    const centrais = Number(document.getElementById("centrais").value) * 250;
+    const centrais = Number(document.getElementById("centrais").value) * 750;
     const mao = Number(document.getElementById("mao").value);
     const cobreRolo = larguraM * 200;
 
@@ -137,22 +138,124 @@ function calcular() {
     const taxaCartao = document.getElementById("cartao").checked ? subtotal * 0.09 : 0;
     const total = subtotal + taxaCartao;
 
+    function gerarResumoCliente() {
+    const largura = Number(document.getElementById("largura").value);
+    const altura = Number(document.getElementById("altura").value);
+
+    const larguraM = (largura / 100).toFixed(2);
+    const area = ((largura * altura) / 10000).toFixed(2);
+
+    const tiras = Math.ceil(altura / 7.5);
+    const kitGuias = Number(document.getElementById("kitQtd").value) || 0;
+    const centrais = Number(document.getElementById("centrais").value) || 0;
+    const pintura = document.getElementById("pintura").checked;
+
+    return `
+    <table style="width:100%; border-collapse:collapse;">
+        <tr><td><b>Motor</b></td><td>1 un.</td></tr>
+        <tr><td><b>Eixo</b></td><td>${larguraM} m</td></tr>
+        <tr><td><b>Soleira</b></td><td>${larguraM} m</td></tr>
+        <tr><td><b>Tiras</b></td><td>${tiras} un.</td></tr>
+        <tr><td><b>Kit guia</b></td><td>${kitGuias} un.</td></tr>
+        <tr><td><b>Cobre rolo</b></td><td>${larguraM} m</td></tr>
+
+        ${pintura ? `<tr><td><b>Pintura epóxi</b></td><td>${area} m²</td></tr>` : ""}
+
+        ${centrais ? `<tr><td><b>Centrais</b></td><td>${centrais} un.</td></tr>` : ""}
+    </table>
+    `;
+}
+
+    
+
     document.getElementById("resultado").innerHTML = `
     
-    <table>
-        <tr><td class="desc">Motor ${regra.motor} kg</td><td class="valor">${moeda(regra.preco)}</td></tr>
-        <tr><td class="desc">Eixo ${regra.eixo}"</td><td class="valor">${moeda(valorEixo)}</td></tr>
-        <tr><td class="desc">Soleira ${regra.soleira}</td><td class="valor">${moeda(valorSoleira)}</td></tr>
-        <tr><td class="desc">Tiras (${tiras} un.)</td><td class="valor">${moeda(valorTiras)}</td></tr>
-        <tr><td class="desc">Kit guia</td><td class="valor">${moeda(valorKit)}</td></tr>
-        <tr><td class="desc">Cobre rolo</td><td class="valor">${moeda(cobreRolo)}</td></tr>
-        <tr><td class="desc">Pintura epóxi</td><td class="valor">${moeda(pintura)}</td></tr>
-        <tr><td class="desc">Centrais</td><td class="valor">${moeda(centrais)}</td></tr>
-        <tr><td class="desc">Mão de obra</td><td class="valor">${moeda(mao)}</td></tr>
-        <tr class="linha-nf"><td class="desc">Nota Fiscal (10%)</td><td class="valor">${moeda(nf)}</td></tr>
-        <tr><td class="desc">Taxa cartão (9%)</td><td class="valor">${moeda(taxaCartao)}</td></tr>
-        <tr class="linha-total"><td class="desc">TOTAL</td><td class="valor">${moeda(total)}</td></tr>
-    </table>`;
+<table>
+
+    <tr>
+        <td class="desc">
+            Motor <span class="qtd">${regra.motor} kg</span>
+        </td>
+        <td class="valor">${moeda(regra.preco)}</td>
+    </tr>
+
+    <tr>
+        <td class="desc">
+            Eixo <span class="qtd">${regra.eixo}"</span>
+        </td>
+        <td class="valor">${moeda(valorEixo)}</td>
+    </tr>
+
+    <tr>
+        <td class="desc">
+            Soleira <span class="qtd">${regra.soleira}</span>
+        </td>
+        <td class="valor">${moeda(valorSoleira)}</td>
+    </tr>
+
+    <tr>
+    <td class="desc">
+        Tiras ${document.getElementById("tira").selectedOptions[0].text}
+        <span class="qtd">(${tiras} un.)</span>
+    </td>
+    <td class="valor">${moeda(valorTiras)}</td>
+</tr>
+
+    <tr>
+    <td class="desc">
+        ${document.getElementById("kitTipo").selectedOptions[0].text}
+        <span class="qtd">(${document.getElementById("kitQtd").value || 0} un.)</span>
+    </td>
+    <td class="valor">${moeda(valorKit)}</td>
+</tr>
+
+    <tr>
+        <td class="desc">
+            Cobre rolo <span class="qtd">${larguraM.toFixed(2)} m</span>
+        </td>
+        <td class="valor">${moeda(cobreRolo)}</td>
+    </tr>
+
+    <tr>
+    <td class="desc">
+        Pintura epóxi
+        
+    </td>
+    <td class="valor">${moeda(pintura)}</td>
+</tr>
+
+    <tr>
+    <td class="desc">
+        Sensor Anti Esmagamento <span class="qtd">(${document.getElementById("centrais").value || 0} un.)</span>
+    </td>
+    <td class="valor">${moeda(centrais)}</td>
+</tr>
+
+    <tr>
+        <td class="desc">Mão de obra</td>
+        <td class="valor">${moeda(mao)}</td>
+    </tr>
+
+    <tr class="linha-nf">
+        <td class="desc">Nota Fiscal (10%)</td>
+        <td class="valor">${moeda(nf)}</td>
+    </tr>
+
+    ${document.getElementById("cartao").checked ? `
+<tr>
+    <td class="desc">Taxa cartão (9%)</td>
+    <td class="valor">${moeda(taxaCartao)}</td>
+</tr>
+` : ""}
+
+    <tr class="linha-total">
+        <td class="desc">TOTAL</td>
+        <td class="valor">${moeda(total)}</td>
+    </tr>
+
+</table>`;
+
+
 
     const agora = new Date();
     ultimoOrcamento = {
@@ -261,6 +364,15 @@ const dataFormatada = hoje.toLocaleDateString("pt-BR", {
     month: "long",
     year: "numeric"
 });
+if (!document.getElementById("pintura").checked) {
+    document.querySelectorAll("tr").forEach(tr => {
+        if (tr.innerText.toLowerCase().includes("pintura epóxi")) {
+            tr.remove();
+        }
+    });
+}
+
+
     // guarda o conteúdo original da página
     const original = document.body.innerHTML;
 
@@ -302,8 +414,8 @@ const dataFormatada = hoje.toLocaleDateString("pt-BR", {
             <p>- Orçamento valido por 10 dias.</p>
 
             <br>
-            <p>PORTA DE AÇO AUTOMÁTICA, em chapa <b>transvision</b> espessura 0,80 galvanizada, MEIA-CANA com terminal com reforço em tubo, guias laterais de 60 x 90 mm, eixo tubo de aço 4.1/2”polegadas, com pontas de aço maciço,  MOTOR, (monofásico) 220 w 1720 RPM com capacidade de carga de 300 kg, freio eletromagnético, fim de curso, limitadores de paradas automáticas, com acionamento através de controle remoto e botoeira com três comandos (abre, para e fecha), sistema de correntes (talha manual) para emergência na falta de energia elétrica. Garantia de 1 ano. <b>Fabricação própria.</b>
-            Instalação no local determinado no prazo de 12 dias para cortinas sem pintura e 22 dias para cortinas com pintura.
+          <p>PORTA DE AÇO AUTOMÁTICA, em chapa galvanizada, MEIA-CANA, com terminal reforçado em tubo, guias laterais chapa dobrada, eixo tubo de aço com pontas de aço maciço,  MOTOR, (monofásico) 220 w 1720 RPM com capacidade de carga calculada pra cada medida de porta,freio eletromagnético, fim de curso, limitadores de paradas automáticas, com acionamento através de controle remoto e botoeira com três comandos (abre, para e fecha), sistema de correntes (talha manual) para emergência na falta de energia elétrica. Garantia de 1 ano. <b>Fabricação e pintura epóxi própria.</b>
+            Instalação no local determinado no prazo de 15 dias para cortinas sem pintura e 22 dias para cortinas com pintura.
             <br><br>
             </p>
             <h4>Responsabilidade do cliente:</h4>
@@ -338,6 +450,122 @@ const dataFormatada = hoje.toLocaleDateString("pt-BR", {
 </div>
 
     `;
+// adiciona cabeçalho PRODUTOS / QUANTIDADES (somente impressão)
+// adiciona cabeçalho PRODUTOS / QUANTIDADES (somente impressão)
+const tabela = document.querySelector("table");
+if (tabela) {
+    const header = document.createElement("tr");
+    header.classList.add("cabecalho-print");
+
+    header.innerHTML = `
+        <td class="desc">Produtos</td>
+        <td class="valor" style="text-align:right;">Quantidades</td>
+    `;
+
+    tabela.prepend(header);
+}
+
+
+document.querySelectorAll("table tr").forEach(tr => {
+    const tdDesc = tr.querySelector("td.desc");
+    const qtdSpan = tr.querySelector(".qtd");
+    if (!tdDesc || !qtdSpan) return;
+
+    const texto = tdDesc.innerText.toLowerCase();
+
+    // guarda KG do motor
+    if (texto.includes("motor")) {
+        const kg = tdDesc.innerText.match(/(\d+\s*kg)/i);
+        if (kg) tr.dataset.motorKg = kg[1];
+    }
+
+    // guarda modelo do eixo
+    if (texto.includes("eixo")) {
+        const modelo = tdDesc.innerText.match(/(\d+[.,]?\d*)/);
+        if (modelo) tr.dataset.eixoModelo = modelo[1];
+    }
+
+    // guarda descrição completa da tira
+    if (texto.includes("tira")) {
+        tr.dataset.tiraTexto = tdDesc.innerText;
+    }
+});
+
+
+/* ================================
+   PASSO 2 — AJUSTAR QUANTIDADES
+================================ */
+document.querySelectorAll("table tr").forEach(tr => {
+    const texto = tr.innerText.toLowerCase();
+    const qtdSpan = tr.querySelector(".qtd");
+    if (!qtdSpan) return;
+
+    // ITENS FIXOS → sempre 1
+    if (
+    texto.includes("motor") ||
+    texto.includes("eixo") ||
+    texto.includes("soleira") ||
+    (texto.includes("mao") && texto.includes("obra"))
+) {
+    qtdSpan.textContent = "1";
+    qtdSpan.style.display = "inline";
+    return;
+}
+
+    // ITENS VARIÁVEIS → só número
+   if (
+    texto.includes("tira") ||
+    texto.includes("kit") ||
+    texto.includes("centrais") ||
+    texto.includes("sensor anti esmagamento")
+) {
+    const numero = qtdSpan.innerText.match(/\d+/);
+    if (numero) qtdSpan.innerText = numero[0];
+}
+});
+
+
+/* ================================
+   PASSO 3 — RESTAURAR DESCRIÇÕES
+================================ */
+document.querySelectorAll("table tr").forEach(tr => {
+    const tdDesc = tr.querySelector("td.desc");
+    if (!tdDesc) return;
+
+    const texto = tdDesc.innerText.toLowerCase();
+
+    // MOTOR → volta KG
+    if (texto.startsWith("motor") && tr.dataset.motorKg) {
+        tdDesc.childNodes[0].nodeValue = `Motor ${tr.dataset.motorKg} `;
+    }
+
+    // EIXO → volta modelo
+    if (texto.startsWith("eixo") && tr.dataset.eixoModelo) {
+        tdDesc.childNodes[0].nodeValue = `Eixo ${tr.dataset.eixoModelo}" `;
+    }
+
+// TIRA → manter descrição até o modelo (ex: 0,80) e remover o resto
+if (texto.startsWith("tira")) {
+    const textoOriginal = tdDesc.innerText;
+
+    // mantém tudo até o último número decimal (modelo)
+    const match = textoOriginal.match(/^(.*?\d+[.,]\d+)/);
+
+    tdDesc.childNodes[0].nodeValue = match
+        ? match[1].trim() + " "
+        : textoOriginal.replace(/\(?\s*\d+\s*un\.?\s*\)?/gi, "").trim() + " ";
+}
+document.querySelectorAll("table tr").forEach(tr => {
+    if (tr.innerText.toLowerCase().includes("mão de obra")) {
+        const td = tr.querySelector("td.desc");
+        if (td && !td.querySelector(".qtd")) {
+            td.insertAdjacentHTML("beforeend", ' <span class="qtd">1</span>');
+        }
+    }
+});
+
+});
+
 
     window.print();
 
