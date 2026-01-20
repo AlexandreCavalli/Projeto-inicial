@@ -532,7 +532,27 @@ document.querySelectorAll("table tr").forEach(tr => {
     const tdDesc = tr.querySelector("td.desc");
     if (!tdDesc) return;
 
-    const texto = tdDesc.innerText.toLowerCase();
+    const texto = tr.innerText.toLowerCase();
+let qtdSpan = tr.querySelector(".qtd");
+
+// PINTURA EPÓXI → sempre 1 (cria qtd se não existir)
+if (texto.includes("pintura epóxi")) {
+    if (!qtdSpan) {
+        const tdDesc = tr.querySelector("td.desc");
+        if (tdDesc) {
+            tdDesc.insertAdjacentHTML(
+                "beforeend",
+                ' <span class="qtd">1</span>'
+            );
+        }
+    } else {
+        qtdSpan.textContent = "1";
+    }
+    return;
+}
+
+// se não tem qtd e não é pintura → ignora
+if (!qtdSpan) return;
 
     // MOTOR → volta KG
     if (texto.startsWith("motor") && tr.dataset.motorKg) {
