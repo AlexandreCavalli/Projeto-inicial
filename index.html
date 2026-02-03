@@ -53,6 +53,9 @@
 <label>Mão de obra (R$):</label>
 <input type="number" id="mao" ><br><br>
 
+<label>Despesa de viagem:</label>
+<input type="number" id="despesa" ><br><br>
+
 <div class="botoes-container">
     <div class="botoes-esquerda">
         <button onclick="calcular()">Calcular</button>
@@ -127,11 +130,12 @@ function calcular() {
     const pintura = document.getElementById("pintura").checked ? area * 70 : 0;
     const centrais = Number(document.getElementById("centrais").value) * 750;
     const mao = Number(document.getElementById("mao").value);
+    const despesa = Number(document.getElementById("despesa").value);
     const cobreRolo = larguraM * 200;
 
     const subtotalItens =
         regra.preco + valorEixo + valorSoleira + valorTiras +
-        valorKit + pintura + centrais + mao + cobreRolo;
+        valorKit + pintura + centrais + mao + cobreRolo + despesa;
 
     const nf = subtotalItens * 0.10;
     const subtotal = subtotalItens + nf;
@@ -234,6 +238,11 @@ function calcular() {
     <tr>
         <td class="desc">Mão de obra</td>
         <td class="valor">${moeda(mao)}</td>
+    </tr>
+
+    <tr>
+        <td class="desc">Despesa viagem</td>
+        <td class="valor">${moeda(despesa)}</td>
     </tr>
 
     <tr class="linha-nf">
@@ -370,6 +379,13 @@ if (!document.getElementById("pintura").checked) {
             tr.remove();
         }
     });
+
+    // REMOVE DESPESA DE VIAGEM SOMENTE NA IMPRESSÃO
+document.querySelectorAll("tr").forEach(tr => {
+    if (tr.innerText.toLowerCase().includes("despesa")) {
+        tr.remove();
+    }
+});
 }
 
 
@@ -409,7 +425,6 @@ if (!document.getElementById("pintura").checked) {
         <h3>Valor Orçado: ${moeda(ultimoOrcamento.total)}</h3>
             <br>
             <p>- Pagamento a vista: Entrada de 50% e restante na entrega</p>
-            <p>- Desconto para pagamento a vista de 8% R$</p>
             <p>- Em até 12x no cartão com juros da máquina </p>
             <p>- Orçamento valido por 10 dias.</p>
 
