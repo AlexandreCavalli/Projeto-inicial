@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Orçamento APS</title>
 <link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
@@ -714,14 +715,36 @@ function finalizarPrint() {
 
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    window.print();
+    if (isMobile) {
 
-    if (!isMobile) {
+        const element = document.body;
+
+        html2pdf().set({
+            margin: 5,
+            filename: 'Orcamento_' + clientee + '.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2 },
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+            }
+        }).from(element).save().then(() => {
+
+            document.body.innerHTML = original;
+
+        });
+
+    } else {
+
+        window.print();
         document.body.innerHTML = original;
+
     }
 
 }
 }
+
 
 
 </script>
