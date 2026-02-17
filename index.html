@@ -720,11 +720,19 @@ function finalizarPrint() {
 
     document.body.innerHTML = printContent;
 
-    window.print();
-
+    // aguarda renderizar
     setTimeout(() => {
-        document.body.innerHTML = original;
-        location.reload();
+
+        window.print();
+
+        // restaura depois
+        setTimeout(() => {
+
+            document.body.innerHTML = original;
+            location.reload();
+
+        }, 1000);
+
     }, 500);
 
 }
