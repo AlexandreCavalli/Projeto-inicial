@@ -486,15 +486,10 @@ document.querySelectorAll("tr").forEach(tr => {
 
     // troca a página inteira só pelo resultado
     document.body.innerHTML = `
-        <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+
+
+<div id="print-area">
+
     <div id="container">
         <div>
             
@@ -551,9 +546,15 @@ document.querySelectorAll("tr").forEach(tr => {
         -----------------------------------------------------------------<br>
         Anderson Pereira Souza
     </p>
-</div>
+</div> <!-- fecha div text-align right -->
 
-    `;
+</div> <!-- fecha div interna -->
+
+</div> <!-- fecha container -->
+
+</div> <!-- fecha print-area -->
+`;
+
 // adiciona cabeçalho PRODUTOS / QUANTIDADES (somente impressão)
 // adiciona cabeçalho PRODUTOS / QUANTIDADES (somente impressão)
 const tabela = document.querySelector("table");
@@ -691,7 +692,7 @@ document.querySelectorAll("table tr").forEach(tr => {
 });
 
 
-   const imagens = document.images;
+   const imagens = document.querySelectorAll("#print-area img");
 let carregadas = 0;
 
 if (imagens.length === 0) {
@@ -717,7 +718,7 @@ function finalizarPrint() {
 
     if (isMobile) {
 
-        const element = document.body;
+        const element = document.getElementById("print-area");
 
         html2pdf().set({
             margin: 5,
