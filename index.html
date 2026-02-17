@@ -64,6 +64,9 @@
     <div class="botoes-direita">
         <button onclick="salvarOrcamento()">Salvar</button>
         <button onclick="imprimir()">Enviar Cliente</button>
+        <button id="btnWhatsApp" onclick="enviarWhatsApp()" style="display:none;">
+    Enviar WhatsApp
+</button>
     </div>
 </div>
 
@@ -267,13 +270,35 @@ function calcular() {
 
 
     const agora = new Date();
-    ultimoOrcamento = {
-        cliente,
-        data: agora.toLocaleDateString("pt-BR") + " " +
-              agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
-        total
-    };
+ultimoOrcamento = {
+    cliente,
+    data: agora.toLocaleDateString("pt-BR") + " " +
+          agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+
+    largura,
+    altura,
+    tira: document.getElementById("tira").selectedOptions[0].text,
+    kitTipo: document.getElementById("kitTipo").selectedOptions[0].text,
+    kitQtd: Number(document.getElementById("kitQtd").value) || 0,
+    pintura: document.getElementById("pintura").checked,
+    cartao: document.getElementById("cartao").checked,
+    centrais: Number(document.getElementById("centrais").value) || 0,
+    mao,
+    despesa,
+
+    subtotal,
+    taxaCartao,
+    total
+};
+
+// ✅ ESSENCIAL
+ultimoOrcamento.html = document.getElementById("resultado").innerHTML;
 }
+
+function fecharVisualizacao() {
+    document.getElementById("resultado").innerHTML = "";
+}
+
 
 function salvarOrcamento() {
     if (!ultimoOrcamento) return;
@@ -291,12 +316,65 @@ function carregarHistorico() {
     h.innerHTML = "";
     lista.forEach((o, i) => {
         h.innerHTML += `
-        <div class="historico-item">
-            ${o.cliente} – ${o.data} – ${moeda(o.total)}
-            <button class="btn-excluir" onclick="excluir(${i})">Excluir</button>
-        </div>`;
+<div class="historico-item">
+    ${o.cliente} – ${o.data} – ${moeda(o.total)}
+    <button onclick="verOrcamento(${i})">Ver</button>
+    <button class="btn-excluir" onclick="excluir(${i})">Excluir</button>
+</div>`;
     });
     atualizarExcluir();
+}
+
+function verOrcamento(i) {
+    const lista = JSON.parse(localStorage.getItem("orcamentos") || "[]");
+    const o = lista[i];
+
+    if (!o || !o.html) {
+        alert("Este orçamento não possui detalhes salvos.");
+        return;
+    }
+
+    document.getElementById("resultado").innerHTML = `
+        <div class="orcamento-visualizacao">
+            <button onclick="fecharVisualizacao()" style="margin-bottom:10px">
+                ⬅ Voltar
+            </button>
+
+            <h3>Orçamento salvo</h3>
+            <br>
+
+            <p><b>Cliente:</b> ${o.cliente}</p>
+            <br>
+            <p><b>Data:</b> ${o.data}</p>
+            <br>
+
+            <hr>
+
+            ${o.html}
+
+            <p style="font-size:13px; color:#777">
+                🔒 Apenas visualização. Nenhuma informação foi alterada.
+            </p>
+        </div>
+    `;
+}
+
+
+function recarregarFormulario(i) {
+    const lista = JSON.parse(localStorage.getItem("orcamentos"));
+    const o = lista[i];
+
+    document.getElementById("cliente").value = o.cliente;
+    document.getElementById("largura").value = o.largura;
+    document.getElementById("altura").value = o.altura;
+    document.getElementById("kitQtd").value = o.kitQtd;
+    document.getElementById("centrais").value = o.centrais;
+    document.getElementById("mao").value = o.mao;
+    document.getElementById("despesa").value = o.despesa;
+    document.getElementById("pintura").checked = o.pintura;
+    document.getElementById("cartao").checked = o.cartao;
+
+    toggleHistorico();
 }
 
 
@@ -337,9 +415,17 @@ function toggleDarkMode() {
 
 /* Carrega preferência salva */
 window.onload = () => {
+
+    // tema salvo
     if (localStorage.getItem('tema') === 'dark') {
         document.body.classList.add('dark');
         document.getElementById('btnDark').innerText = '☀️ Modo claro';
+    }
+
+    // mostra botão WhatsApp somente no celular
+    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        const btn = document.getElementById("btnWhatsApp");
+        if (btn) btn.style.display = "inline-block";
     }
 };
 
@@ -359,6 +445,8 @@ carregarHistorico()
 function imprimir() {
     const resultado = document.getElementById("resultado");
     const clientee = document.getElementById('cliente').value;
+
+    
     
 
     if (!resultado.innerHTML.trim()) {
@@ -602,10 +690,37 @@ document.querySelectorAll("table tr").forEach(tr => {
 });
 
 
+   const imagens = document.images;
+let carregadas = 0;
+
+if (imagens.length === 0) {
+    finalizarPrint();
+} else {
+    for (let i = 0; i < imagens.length; i++) {
+        if (imagens[i].complete) {
+            carregadas++;
+        } else {
+            imagens[i].onload = () => {
+                carregadas++;
+                if (carregadas === imagens.length) finalizarPrint();
+            };
+        }
+    }
+
+    if (carregadas === imagens.length) finalizarPrint();
+}
+
+function finalizarPrint() {
+
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
     window.print();
 
-    // volta a página ao normal
-    document.body.innerHTML = original;
+    if (!isMobile) {
+        document.body.innerHTML = original;
+    }
+
+}
 }
 
 
