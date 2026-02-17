@@ -714,26 +714,15 @@ if (imagens.length === 0) {
 
 function finalizarPrint() {
 
-    const original = document.body.innerHTML;
+    const element = document.getElementById("print-area");
 
-    const printContent = document.getElementById("print-area").outerHTML;
-
-    document.body.innerHTML = printContent;
-
-    // aguarda renderizar
-    setTimeout(() => {
-
-        window.print();
-
-        // restaura depois
-        setTimeout(() => {
-
-            document.body.innerHTML = original;
-            location.reload();
-
-        }, 1000);
-
-    }, 500);
+    html2pdf().set({
+        margin: 5,
+        filename: 'Orcamento.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }).from(element).save();
 
 }
 }
